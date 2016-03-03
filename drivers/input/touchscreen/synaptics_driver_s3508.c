@@ -148,7 +148,7 @@ struct test_header {
 #define BIT6 (0x1 << 6)
 #define BIT7 (0x1 << 7)
 
-#define IMPLEMENTED_FUNCTIONS	(BIT0 | BIT1)
+#define IMPLEMENTED_FUNCTIONS	(BIT0)
 
 int LeftVee_gesture = 0; //">"
 int RightVee_gesture = 0; //"<"
