@@ -11,7 +11,7 @@
 #######################################
 
 BOEFFLA_VERSION="1.0-test-CM-oneplusx"
-EXTENDED_CMDLINE="androidboot.selinux=permissive"
+EXTENDED_CMDLINE=""
 
 TOOLCHAIN="/opt/toolchains/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-"
 
