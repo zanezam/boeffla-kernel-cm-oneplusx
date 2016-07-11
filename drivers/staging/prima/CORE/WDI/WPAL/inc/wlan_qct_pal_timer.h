@@ -36,9 +36,6 @@
                
    Definitions for platform independent.
   
-   Copyright 2010-2011 (c) Qualcomm, Incorporated.  All Rights Reserved.
-   
-   Qualcomm Confidential and Proprietary.
   
   ========================================================================*/
 
@@ -90,7 +87,7 @@ wpt_status wpalTimerDelete(wpt_timer * pTimer);
 wpt_status wpalTimerStart(wpt_timer * pTimer, wpt_uint32 timeout);
 
 /*---------------------------------------------------------------------------
-    wpalTimerStop - stop a wpt_timer object. Stop doesn?t guarantee the timer handler is not called if it is already timeout.
+    wpalTimerStop - stop a wpt_timer object. Stop doesn’t guarantee the timer handler is not called if it is already timeout.
     Param:
         pTimer - a pointer to caller allocated wpt_timer object
     Return:

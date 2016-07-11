@@ -33,9 +33,6 @@
                
    Definitions for platform Windows and with legacy UMAC.
   
-   Copyright 2010 (c) Qualcomm, Incorporated.  All Rights Reserved.
-   
-   Qualcomm Confidential and Proprietary.
   
   ========================================================================*/
 
@@ -135,7 +132,7 @@ wpt_status wpalMutexRelease(wpt_mutex *pMutex)
 /*---------------------------------------------------------------------------
     @brief Initialize an event object
 
-    \param pEvent ? a pointer to caller allocated object of wpt_event
+    \param pEvent – a pointer to caller allocated object of wpt_event
 
     \return eWLAN_PAL_STATUS_SUCCESS if success. Fail otherwise.
 ------------------------------------------------------------------------*/
@@ -156,7 +153,7 @@ wpt_status wpalEventInit(wpt_event *pEvent)
 /*---------------------------------------------------------------------------
     @brief Invalidate an event object
 
-    \param pEvent ? a pointer to caller allocated object of wpt_event
+    \param pEvent – a pointer to caller allocated object of wpt_event
 
     \return eWLAN_PAL_STATUS_SUCCESS if success. Fail otherwise.
 ------------------------------------------------------------------------*/
@@ -176,10 +173,10 @@ wpt_status wpalEventDelete(wpt_event *pEvent)
 }
 
 /*---------------------------------------------------------------------------
-    @brief wpalEventWait ? Wait on an event object
+    @brief wpalEventWait – Wait on an event object
 
     \param
-        pEvent ? a pointer to caller allocated object of wpt_event
+        pEvent – a pointer to caller allocated object of wpt_event
         timeout - timeout value at unit of milli-seconds. 
                   0xffffffff means infinite wait
 
@@ -219,11 +216,11 @@ wpt_status wpalEventWait(wpt_event *pEvent, wpt_uint32 timeout)
 }
 
 /*---------------------------------------------------------------------------
-    wpalEventSet ? Set an event object to signaled state
+    wpalEventSet – Set an event object to signaled state
     Param:
-        pEvent ? a pointer to caller allocated object of wpt_event
+        pEvent – a pointer to caller allocated object of wpt_event
     Return:
-        eWLAN_PAL_STATUS_SUCCESS ? success. Fail otherwise.
+        eWLAN_PAL_STATUS_SUCCESS – success. Fail otherwise.
 ---------------------------------------------------------------------------*/
 wpt_status wpalEventSet(wpt_event *pEvent)
 {
@@ -233,11 +230,11 @@ wpt_status wpalEventSet(wpt_event *pEvent)
 }
 
 /*---------------------------------------------------------------------------
-    wpalEventReset ? Set an event object to non-signaled state
+    wpalEventReset – Set an event object to non-signaled state
     Param:
-        pEvent ? a pointer to caller allocated object of wpt_event
+        pEvent – a pointer to caller allocated object of wpt_event
     Return:
-        eWLAN_PAL_STATUS_SUCCESS ? success. Fail otherwise.
+        eWLAN_PAL_STATUS_SUCCESS – success. Fail otherwise.
 ---------------------------------------------------------------------------*/
 wpt_status wpalEventReset(wpt_event *pEvent)
 {

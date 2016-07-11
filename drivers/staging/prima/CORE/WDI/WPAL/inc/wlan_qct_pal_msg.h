@@ -37,9 +37,6 @@
                
    Definitions for platform dependent. Only work with legacy UMAC.
   
-   Copyright 2010 (c) Qualcomm, Incorporated.  All Rights Reserved.
-   
-   Qualcomm Confidential and Proprietary.
   
   ========================================================================*/
 
@@ -68,30 +65,30 @@ struct swpt_msg
 
 
 /*---------------------------------------------------------------------------
-   wpalPostCtrlMsg ? Post a message to control context so it can 
+   wpalPostCtrlMsg – Post a message to control context so it can 
                            be processed in that context.
    Param: 
-      pPalContext ? A PAL context
-      pMsg ? a pointer to called allocated object; Caller retain the ownership 
+      pPalContext – A PAL context
+      pMsg – a pointer to called allocated object; Caller retain the ownership 
              after this API returns.
 ---------------------------------------------------------------------------*/
 wpt_status wpalPostCtrlMsg(void *pPalContext, wpt_msg *pMsg);
 
 
 /*---------------------------------------------------------------------------
-   wpalPostTxMsg ? Post a message to TX context so it can be processed in that context.
+   wpalPostTxMsg – Post a message to TX context so it can be processed in that context.
    Param: 
-      pPalContext ? A PAL context
-      pMsg ? a pointer to called allocated object; Caller retain the ownership 
+      pPalContext – A PAL context
+      pMsg – a pointer to called allocated object; Caller retain the ownership 
              after this API returns.
 ---------------------------------------------------------------------------*/
 wpt_status wpalPostTxMsg(void *pPalContext, wpt_msg *pMsg);
 
 /*---------------------------------------------------------------------------
-   wpalPostRxMsg ? Post a message to RX context so it can be processed in that context.
+   wpalPostRxMsg – Post a message to RX context so it can be processed in that context.
    Param: 
-      pPalContext ? A PAL context
-      pMsg ? a pointer to called allocated object; Caller retain the ownership 
+      pPalContext – A PAL context
+      pMsg – a pointer to called allocated object; Caller retain the ownership 
              after this API returns.
 ---------------------------------------------------------------------------*/
 wpt_status wpalPostRxMsg(void *pPalContext, wpt_msg *pMsg);

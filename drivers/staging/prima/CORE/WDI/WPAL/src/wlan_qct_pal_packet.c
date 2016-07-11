@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014-2015 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -33,9 +33,6 @@
                
    Definitions for platform with VOSS packet support and LA.
   
-   Copyright 2010 (c) Qualcomm, Incorporated.  All Rights Reserved.
-   
-   Qualcomm Confidential and Proprietary.
   
   ========================================================================*/
 
@@ -46,6 +43,7 @@
 #include "vos_packet.h"
 #include "vos_trace.h"
 #include "vos_list.h"
+#include "vos_api.h"
 
 #include <linux/skbuff.h>
 #include "dma-mapping.h"
@@ -94,9 +92,9 @@ wpt_status wpalPacketClose(void *pPalContext)
 }
 
 /*---------------------------------------------------------------------------
-    wpalPacketRXLowResourceCB ? RX RAW packer CB function
+    wpalPacketRXLowResourceCB – RX RAW packer CB function
     Param: 
-        pPacket ? Available RX packet
+        pPacket – Available RX packet
         userData - PAL Client Context, DXE
     Return:
         Status
@@ -134,9 +132,9 @@ VOS_STATUS wpalPacketRXLowResourceCB(vos_pkt_t *pPacket, v_VOID_t *userData)
 }
 
 /*---------------------------------------------------------------------------
-    wpalPacketAlloc ? Allocate a wpt_packet from PAL.
+    wpalPacketAlloc – Allocate a wpt_packet from PAL.
     Param: 
-        pktType ? specify the type of wpt_packet to allocate
+        pktType – specify the type of wpt_packet to allocate
         nPktSize - packet size
     Return:
         A pointer to the wpt_packet. NULL means fail.
@@ -180,14 +178,13 @@ wpt_packet * wpalPacketAlloc(wpt_packet_type pktType, wpt_uint32 nPktSize,
                                        nPktSize, 1, VOS_FALSE, 
                                        wpalPacketRXLowResourceCB, usrData);
 
-#ifndef FEATURE_R33D
       /* Reserve the entire raw rx buffer for DXE */
       if( vosStatus == VOS_STATUS_SUCCESS )
       {
         wpalPacketAvailableCB = NULL;
         vosStatus =  vos_pkt_reserve_head_fast( pVosPkt, &pData, nPktSize ); 
       }
-#endif /* FEATURE_R33D */
+
       if((NULL != pVosPkt) && (VOS_STATUS_E_RESOURCES != vosStatus))
       {
          vos_pkt_get_packet_length(pVosPkt, &allocLen);
@@ -219,10 +216,10 @@ wpt_packet * wpalPacketAlloc(wpt_packet_type pktType, wpt_uint32 nPktSize,
 
 
 /*---------------------------------------------------------------------------
-    wpalPacketFree ? Free a wpt_packet chain for one particular type.
+    wpalPacketFree – Free a wpt_packet chain for one particular type.
     For our legacy UMAC, it is not needed because vos_packet contains pal_packet.
     Param: 
-        pPkt ? pointer to a wpt_packet
+        pPkt – pointer to a wpt_packet
     Return:
         eWLAN_PAL_STATUS_SUCCESS - success
 ---------------------------------------------------------------------------*/
@@ -242,7 +239,7 @@ wpt_status wpalPacketFree(wpt_packet *pPkt)
 
 
 /*---------------------------------------------------------------------------
-    wpalPacketGetLength ? Get number of bytes in a wpt_packet. It include the 
+    wpalPacketGetLength – Get number of bytes in a wpt_packet. It include the 
     bytes in a BD if it exist.
     Param: 
         pPkt - pointer to a packet to be freed.
@@ -282,13 +279,13 @@ wpt_uint32 wpalPacketGetLength(wpt_packet *pPkt)
 
 
 /*---------------------------------------------------------------------------
-    wpalPacketRawTrimHead ? Move the starting offset and return the head pointer
+    wpalPacketRawTrimHead – Move the starting offset and return the head pointer
           before the moving. The function can only be used with raw packets,
           whose buffer is one piece and allocated by WLAN driver. This also
           reduce the length of the packet.
     Param: 
         pPkt - pointer to a wpt_packet.
-        size ? number of bytes to take off the head.
+        size – number of bytes to take off the head.
     Return:
         A pointer to the original buffer head before the trimming.
 ---------------------------------------------------------------------------*/
@@ -328,12 +325,12 @@ wpt_status wpalPacketRawTrimHead(wpt_packet *pPkt, wpt_uint32 size)
 }/*wpalPacketRawTrimHead*/
 
 /*---------------------------------------------------------------------------
-    wpalPacketRawTrimTail ? reduce the length of the packet.
+    wpalPacketRawTrimTail – reduce the length of the packet.
     Param: 
         pPkt - pointer to a wpt_packet.
-        size ? number of bytes to take of the packet length
+        size – number of bytes to take of the packet length
     Return:
-        eWLAN_PAL_STATUS_SUCCESS ? success. Otherwise fail.
+        eWLAN_PAL_STATUS_SUCCESS – success. Otherwise fail.
 ---------------------------------------------------------------------------*/
 wpt_status wpalPacketRawTrimTail(wpt_packet *pPkt, wpt_uint32 size)
 {
@@ -372,7 +369,7 @@ wpt_status wpalPacketRawTrimTail(wpt_packet *pPkt, wpt_uint32 size)
 
 
 /*---------------------------------------------------------------------------
-    wpalPacketGetRawBuf ? Return the starting buffer virtual address for the RAW flat buffer
+    wpalPacketGetRawBuf – Return the starting buffer virtual address for the RAW flat buffer
     It is inline in hope of faster implementation for certain platform. For Winxp, it 
     will be slow.
     Param: 
@@ -406,7 +403,7 @@ wpt_uint8 *wpalPacketGetRawBuf(wpt_packet *pPkt)
 
 
 /*---------------------------------------------------------------------------
-    wpalPacketSetRxLength ? Set the valid data length on a RX packet. This function must 
+    wpalPacketSetRxLength – Set the valid data length on a RX packet. This function must 
     be called once per RX packet per receiving. It indicates the available data length from
     the start of the buffer.
     Param: 
@@ -522,10 +519,10 @@ WPT_STATIC WPT_INLINE void itReturnOSPktAddrFromDevice( wpt_packet *pPacket, voi
 
 
 /*---------------------------------------------------------------------------
-    wpalIteratorInit ? Initialize an interator by updating pCur to first item.
+    wpalIteratorInit – Initialize an interator by updating pCur to first item.
     Param: 
-        pIter ? pointer to a caller allocated wpt_iterator
-        pPacket ? pointer to a wpt_packet
+        pIter – pointer to a caller allocated wpt_iterator
+        pPacket – pointer to a wpt_packet
     Return:
         eWLAN_PAL_STATUS_SUCCESS - success
 ---------------------------------------------------------------------------*/
@@ -586,13 +583,13 @@ wpt_status wpalIteratorInit(wpt_iterator *pIter, wpt_packet *pPacket)
 }/*wpalIteratorInit*/
 
 /*---------------------------------------------------------------------------
-    wpalIteratorNext ? Get the address for the next item
+    wpalIteratorNext – Get the address for the next item
     Param: 
-        pIter ? pointer to a caller allocated wpt_iterator
-        pPacket ? pointer to a wpt_packet
-        ppAddr ? Caller allocated pointer to return the address of the item.
+        pIter – pointer to a caller allocated wpt_iterator
+        pPacket – pointer to a wpt_packet
+        ppAddr – Caller allocated pointer to return the address of the item.
         For DMA-able devices, this is the physical address of the item.
-        pLen ? To return the number of bytes in the item.
+        pLen – To return the number of bytes in the item.
     Return:
         eWLAN_PAL_STATUS_SUCCESS - success
 ---------------------------------------------------------------------------*/
@@ -648,12 +645,12 @@ wpt_status wpalIteratorNext(wpt_iterator *pIter, wpt_packet *pPacket, void **ppA
 }
 
 /*---------------------------------------------------------------------------
-    wpalLockPacketForTransfer ? Map the data buffer from dma so that the
+    wpalLockPacketForTransfer – Map the data buffer from dma so that the
                          data is commited from cache and the cpu relinquishes
                          ownership of the buffer
  
     Param: 
-        pPacket ? pointer to a wpt_packet
+        pPacket – pointer to a wpt_packet
  
     Return:
         eWLAN_PAL_STATUS_SUCCESS - success
@@ -736,10 +733,10 @@ wpt_status wpalLockPacketForTransfer( wpt_packet *pPacket)
 }/*wpalLockPacketForTransfer*/
 
 /*---------------------------------------------------------------------------
-    wpalUnlockPacket ? Unmap the data buffer from dma so that cpu can regain
+    wpalUnlockPacket – Unmap the data buffer from dma so that cpu can regain
                           ownership on it
     Param: 
-        pPacket ? pointer to a wpt_packet
+        pPacket – pointer to a wpt_packet
  
     Return:
         eWLAN_PAL_STATUS_SUCCESS - success
@@ -823,9 +820,9 @@ wpt_status wpalUnlockPacket( wpt_packet *pPacket)
 }/*wpalUnlockPacket*/
 
 /*---------------------------------------------------------------------------
-    wpalIsPacketLocked ?  Check whether the Packet is locked for DMA.
+    wpalIsPacketLocked –  Check whether the Packet is locked for DMA.
     Param: 
-        pPacket ? pointer to a wpt_packet
+        pPacket – pointer to a wpt_packet
  
     Return:
         eWLAN_PAL_STATUS_SUCCESS
@@ -898,7 +895,7 @@ wpt_status wpalGetNumRxFreePacket(wpt_uint32 *numRxResource)
 }
 
 /*---------------------------------------------------------------------------
-    wpalPacketStallUpdateInfo ? Update each channel information when stall
+    wpalPacketStallUpdateInfo – Update each channel information when stall
        detected, also power state and free resource count
 
     Param:
@@ -944,7 +941,7 @@ void wpalPacketStallUpdateInfo
 
 #ifdef FEATURE_WLAN_DIAG_SUPPORT
 /*---------------------------------------------------------------------------
-    wpalPacketStallDumpLog ? Trigger to send log packet to DIAG
+    wpalPacketStallDumpLog – Trigger to send log packet to DIAG
        Updated transport system information will be sent to DIAG
 
     Param:
@@ -976,3 +973,65 @@ void wpalPacketStallDumpLog
    return;
 }
 #endif /* FEATURE_WLAN_DIAG_SUPPORT */
+
+/*---------------------------------------------------------------------------
+    wpalLogPktSerialize - Serialize Logging data to logger thread
+
+    Param:
+    wpt_packet pFrame - The packet which contains the logging data.
+                        This packet has to be a VALID packet, as this
+                        API will not do any checks on the validity of
+                        the packet.
+
+    Return:
+        NONE
+
+---------------------------------------------------------------------------*/
+void wpalLogPktSerialize
+(
+   wpt_packet *pFrame
+)
+{
+   WDI_DS_RxMetaInfoType *pRxMetadata;
+   void                  *pBuffer;
+   VOS_STATUS             vosStatus;
+
+   vosStatus = vos_pkt_peek_data(WPAL_TO_VOS_PKT(pFrame), 0, &pBuffer,
+                                 WDI_DS_LOG_PKT_TYPE_LEN);
+
+   if (VOS_IS_STATUS_SUCCESS(vosStatus))
+   {
+      // a VALID packet implies non NULL meta-data
+      pRxMetadata = WDI_DS_ExtractRxMetaData(pFrame);
+      pRxMetadata->loggingData = *((wpt_uint32 *)pBuffer);
+
+      wpalPacketRawTrimHead(pFrame, WDI_DS_LOG_PKT_TYPE_LEN);
+
+      vos_logger_pkt_serialize(WPAL_TO_VOS_PKT(pFrame), pRxMetadata->loggingData);
+   }
+   else
+   {
+      vos_pkt_return_packet(WPAL_TO_VOS_PKT(pFrame));
+   }
+}
+
+/*---------------------------------------------------------------------------
+    wpalFwLogPktSerialize - Serialize Logging data to logger thread
+
+    Param:
+    wpt_packet pFrame - The packet which contains the logging data.
+                        This packet has to be a VALID packet, as this
+                        API will not do any checks on the validity of
+                        the packet.
+
+    Return:
+        NONE
+
+---------------------------------------------------------------------------*/
+void wpalFwLogPktSerialize
+(
+   wpt_packet *pFrame
+)
+{
+    vos_logger_pkt_serialize(WPAL_TO_VOS_PKT(pFrame),LOG_PKT_TYPE_FW_LOG);
+}
