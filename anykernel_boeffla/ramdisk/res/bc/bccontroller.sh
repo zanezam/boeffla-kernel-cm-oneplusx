@@ -1270,14 +1270,27 @@ fi
 
 if [ "apply_ums" == "$1" ]; then
 	if [ "1" == "$2" ]; then
+		echo "1" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun0/nofua
+		echo "0" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun0/ro
+		echo "0" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun0/cdrom
+		echo "" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun0/file
+		echo "1" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun1/nofua
+		echo "0" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun1/ro
 		echo "0" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun1/cdrom
-		/system/bin/setprop persist.sys.usb.config mass_storage,adb
 		echo "/dev/block/mmcblk1p1" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun1/file
+		echo 0 > /sys/class/android_usb/android0/enable;
+		echo mass_storage > /sys/class/android_usb/android0/functions
+		echo 1 > /sys/class/android_usb/android0/enable
+		setprop sys.usb.config mass_storage,adb
 	fi
 
 	if [ "0" == "$2" ]; then
+		echo "" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun0/file
 		echo "" > /sys/devices/msm_dwc3/f9200000.dwc3/gadget/lun1/file
-		/system/bin/setprop persist.sys.usb.config mtp,adb
+		echo 0 > /sys/class/android_usb/android0/enable;
+		echo mtp > /sys/class/android_usb/android0/functions
+		echo 1 > /sys/class/android_usb/android0/enable
+		setprop sys.usb.config mtp,adb
 	fi
 	exit 0
 fi
