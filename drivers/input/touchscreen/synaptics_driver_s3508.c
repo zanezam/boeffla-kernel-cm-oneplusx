@@ -1510,10 +1510,10 @@ static void gesture_judge(struct synaptics_ts_data *ts)
             gesture = Circle;
             break;
         case SWIPE_DETECT:
-            gesture =   // (regswipe == 0x41) ? Left2RightSwip   :
-                        // (regswipe == 0x42) ? Right2LeftSwip   :
-                        // (regswipe == 0x44) ? Up2DownSwip      :
-                        // (regswipe == 0x48) ? Down2UpSwip      :
+            gesture =   (regswipe == 0x41) ? Left2RightSwip   :
+                        (regswipe == 0x42) ? Right2LeftSwip   :
+                        (regswipe == 0x44) ? Up2DownSwip      :
+                        (regswipe == 0x48) ? Down2UpSwip      :
                         (regswipe == 0x80) ? DouSwip          :
                         UnkownGesture;
             break;
@@ -1601,20 +1601,7 @@ static void gesture_judge(struct synaptics_ts_data *ts)
 
 
 	synaptics_get_coordinate_point(ts);
-	if(gesture != UnkownGesture ){
-		// AP: commented out for CM - CM has its own handling
-
-		// check if haptic feedback for gesture should be suppressed
-		//if (DisableGestureHaptic)
-		//	qpnp_hap_ignore_next_request();
-
-        gesture_upload = gesture;
-		input_report_key(ts->input_dev, keyCode, 1);
-		input_sync(ts->input_dev);
-		input_report_key(ts->input_dev, keyCode, 0);
-		input_sync(ts->input_dev);
-    }
-    else if ((gesture == Left2RightSwip && Left2RightSwip_gesture)||(gesture == Right2LeftSwip && Right2LeftSwip_gesture)\
+	if ((gesture == Left2RightSwip && Left2RightSwip_gesture)||(gesture == Right2LeftSwip && Right2LeftSwip_gesture)\
 			||(gesture == Up2DownSwip && Up2DownSwip_gesture)||(gesture == Down2UpSwip && Down2UpSwip_gesture))
     {
 		// AP: commented out for CM - CM has its own handling
@@ -1637,6 +1624,19 @@ static void gesture_judge(struct synaptics_ts_data *ts)
 			schedule_work(&boeffla_syn_presspwr_work);
 		//}
 	}
+	else if(gesture != UnkownGesture ){
+		// AP: commented out for CM - CM has its own handling
+
+		// check if haptic feedback for gesture should be suppressed
+		//if (DisableGestureHaptic)
+		//	qpnp_hap_ignore_next_request();
+
+        gesture_upload = gesture;
+		input_report_key(ts->input_dev, keyCode, 1);
+		input_sync(ts->input_dev);
+		input_report_key(ts->input_dev, keyCode, 0);
+		input_sync(ts->input_dev);
+    }
 	else{
 		//if(is_project(OPPO_14005) || is_project(OPPO_15011)){
 			ret = i2c_smbus_read_i2c_block_data( ts->client, F12_2D_CTRL20, 3, &(reportbuf[0x0]) );
