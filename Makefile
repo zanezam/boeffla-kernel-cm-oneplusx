@@ -381,7 +381,7 @@ KBUILD_CFLAGS   := -Wall -DNDEBUG -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks -Wno-format-length -Wno-bool-operation \
 		   -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon-vfpv4 -marm \
 		   -fsingle-precision-constant -Wno-maybe-uninitialized \
-		   -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr \
+		   -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -Wno-format-truncation -Wno-format-overflow \
        		   -fno-diagnostics-show-caret
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
