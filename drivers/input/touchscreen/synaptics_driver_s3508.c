@@ -151,8 +151,6 @@ struct test_header {
 #define BIT6 (0x1 << 6)
 #define BIT7 (0x1 << 7)
 
-#define IMPLEMENTED_FUNCTIONS	(BIT0)
-
 int LeftVee_gesture = 0; //">"
 int RightVee_gesture = 0; //"<"
 int DouSwip_gesture = 0; // "||"
@@ -208,8 +206,6 @@ static struct workqueue_struct *speedup_resume_wq = NULL;
 static struct proc_dir_entry *prEntry_tp = NULL;
 static struct proc_dir_entry *prEntry_tmp = NULL;
 static struct proc_dir_entry *prEntry_tpreset = NULL;
-static struct input_dev * boeffla_syn_pwrdev;
-static DEFINE_MUTEX(boeffla_syn_pwrkeyworklock);
 
 #ifdef SUPPORT_TP_SLEEP_MODE
 	static atomic_t sleep_enable;
@@ -237,8 +233,6 @@ static atomic_t keypad_enable;
 static struct proc_dir_entry *prEntry_dtap = NULL;
 static struct proc_dir_entry *prEntry_coodinate  = NULL;
 static struct proc_dir_entry *prEntry_double_tap = NULL;
-static struct proc_dir_entry *prEntry_sweep_wake_tap = NULL;
-static struct proc_dir_entry *prEntry_sweep_wake_tap_implemented = NULL;
 static struct proc_dir_entry *prEntry_vendor_id  = NULL;
 
 
@@ -406,26 +400,6 @@ struct synaptics_optimize_data{
 	const struct i2c_device_id *dev_id;
 };
 static struct synaptics_optimize_data optimize_data;
-
-static void boeffla_syn_presspwr(struct work_struct * boeffla_syn_presspwr_work)
-{
-	if (!mutex_trylock(&boeffla_syn_pwrkeyworklock))
-		return;
-
-	input_event(boeffla_syn_pwrdev, EV_KEY, KEY_POWER, 1);
-	input_event(boeffla_syn_pwrdev, EV_SYN, 0, 0);
-	msleep(60);
-
-	input_event(boeffla_syn_pwrdev, EV_KEY, KEY_POWER, 0);
-	input_event(boeffla_syn_pwrdev, EV_SYN, 0, 0);
-	msleep(60);
-
-    mutex_unlock(&boeffla_syn_pwrkeyworklock);
-	return;
-}
-static DECLARE_WORK(boeffla_syn_presspwr_work, boeffla_syn_presspwr);
-
-
 static void synaptics_ts_probe_func(struct work_struct *w)
 {
 	struct i2c_client *client_optimize = optimize_data.client;
@@ -1597,13 +1571,7 @@ static void gesture_judge(struct synaptics_ts_data *ts)
 
 
 	synaptics_get_coordinate_point(ts);
-	if ((gesture == Left2RightSwip && Left2RightSwip_gesture)||(gesture == Right2LeftSwip && Right2LeftSwip_gesture)\
-			||(gesture == Up2DownSwip && Up2DownSwip_gesture)||(gesture == Down2UpSwip && Down2UpSwip_gesture))
-    {
-		// press powerkey
-		schedule_work(&boeffla_syn_presspwr_work);
-	}
-	else if(gesture != UnkownGesture ){
+	if(gesture != UnkownGesture ){
 		gesture_upload = gesture;
 			if (keyCode != 0) {
 				input_report_key(ts->input_dev, keyCode, 1);
@@ -2170,8 +2138,7 @@ static int tp_double_write_func(struct file *file, const char __user *buffer, si
 	Circle_gesture = (buf[0] & BIT6)?1:0; //"O"
 	DouTap_gesture = (buf[0] & BIT7)?1:0; //double tap
 	if(DouTap_gesture||Circle_gesture||UpVee_gesture||LeftVee_gesture\
-        ||RightVee_gesture||DouSwip_gesture\
-        ||Left2RightSwip_gesture||Right2LeftSwip_gesture||Down2UpSwip_gesture||Up2DownSwip_gesture)
+        ||RightVee_gesture||DouSwip_gesture)
 	{
 		atomic_set(&double_enable, 1);
 	}
@@ -2208,42 +2175,6 @@ static int tp_double_write_func(struct file *file, const char __user *buffer, si
 				TPD_ERR("Please enter 0 or 1 to open or close the double-tap function\n");
 		}
 	}
-	return count;
-}
-
-static int tp_sweep_wake_implemented_read_func(struct file *file, char __user *user_buf, size_t count, loff_t *ppos)
-{
-	int ret = 0;
-	char page[PAGESIZE];
-	ret = sprintf(page, "%d\n", IMPLEMENTED_FUNCTIONS);
-	ret = simple_read_from_buffer(user_buf, count, ppos, page, strlen(page));
-	return ret;
-}
-
-static int tp_sweep_wake_read_func(struct file *file, char __user *user_buf, size_t count, loff_t *ppos)
-{
-	int ret = 0;
-	char page[PAGESIZE];
-	ret = sprintf(page, "%d\n", Left2RightSwip_gesture);
-	ret = simple_read_from_buffer(user_buf, count, ppos, page, strlen(page));
-	return ret;
-}
-
-static int tp_sweep_wake_write_func(struct file *file, const char __user *buffer, size_t count, loff_t *ppos)
-{
-	char buf[10];
-	if( count > 2)
-		return count;
-	if( copy_from_user(buf, buffer, count) ){
-		printk(KERN_INFO "%s: read proc input error.\n", __func__);
-		return count;
-	}
-
-	Left2RightSwip_gesture = (buf[0] & BIT0) ? 1 : 0;
-	Right2LeftSwip_gesture = (buf[0] & BIT0) ? 1 : 0;
-	Up2DownSwip_gesture = (buf[0] & BIT0) ? 1 : 0;
-	Down2UpSwip_gesture = (buf[0] & BIT0) ? 1 : 0;
-
 	return count;
 }
 
@@ -3978,19 +3909,6 @@ static const struct file_operations keypad_enable_proc_fops = {
 	.owner = THIS_MODULE,
 };
 
-static const struct file_operations tp_sweep_wake_proc_fops = {
-	.write = tp_sweep_wake_write_func,
-	.read =  tp_sweep_wake_read_func,
-	.open = simple_open,
-	.owner = THIS_MODULE,
-};
-
-static const struct file_operations tp_sweep_wake_implemented_proc_fops = {
-	.read =  tp_sweep_wake_implemented_read_func,
-	.open = simple_open,
-	.owner = THIS_MODULE,
-};
-
 static const struct file_operations coordinate_proc_fops = {
 	.read =  coordinate_proc_read_func,
 	.open = simple_open,
@@ -4081,19 +3999,6 @@ static int init_synaptics_proc(void)
 		ret = -ENOMEM;
 		printk(KERN_INFO"init_synaptics_proc: Couldn't create proc entry\n");
 	}
-
-	prEntry_sweep_wake_tap = proc_create( "sweep_wake_enable", 0666, prEntry_tp, &tp_sweep_wake_proc_fops);
-	if(prEntry_sweep_wake_tap == NULL){
-		ret = -ENOMEM;
-		printk(KERN_INFO"init_synaptics_proc: Couldn't create proc entry\n");
-	}
-
-	prEntry_sweep_wake_tap_implemented = proc_create( "sweep_wake_enable_implemented", 0666, prEntry_tp, &tp_sweep_wake_implemented_proc_fops);
-	if(prEntry_sweep_wake_tap_implemented == NULL){
-		ret = -ENOMEM;
-		printk(KERN_INFO"init_synaptics_proc: Couldn't create proc entry\n");
-	}
-
 	prEntry_coodinate = proc_create("coordinate", 0444, prEntry_tp, &coordinate_proc_fops);
 	if(prEntry_coodinate == NULL){
 		ret = -ENOMEM;
@@ -5335,32 +5240,11 @@ static int fb_notifier_callback(struct notifier_block *self, unsigned long event
 #endif
 
 static int __init tpd_driver_init(void) {
-	int rc = 0;
-
 	printk("Synaptics:%s is called\n", __func__);
 	 if( i2c_add_driver(&tpd_i2c_driver)!= 0 ){
         TPDTM_DMESG("unable to add i2c driver.\n");
         return -1;
     }
-
-	// allocate and register input device for sending power key events
-	boeffla_syn_pwrdev = input_allocate_device();
-	if (!boeffla_syn_pwrdev)
-	{
-		pr_err("Can't allocate suspend autotest power button\n");
-		return -EFAULT;
-	}
-
-	input_set_capability(boeffla_syn_pwrdev, EV_KEY, KEY_POWER);
-	boeffla_syn_pwrdev->name = "boeffla_syn_pwrkey";
-	boeffla_syn_pwrdev->phys = "boeffla_syn_pwrkey/input0";
-	rc = input_register_device(boeffla_syn_pwrdev);
-	if (rc)
-	{
-		pr_err("%s: input_register_device err=%d\n", __func__, rc);
-		return -EFAULT;
-	}
-
 	return 0;
 }
 
