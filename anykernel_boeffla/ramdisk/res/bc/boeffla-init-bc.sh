@@ -68,7 +68,12 @@
 # remove not used configuration files
 	/sbin/busybox rm -f $BUSYBOX_ENABLER
 	/sbin/busybox rm -f $FRANDOM_ENABLER
-	
+
+# execute the early startconfig script, if it exists
+	if [ -f $BOEFFLA_STARTCONFIG_EARLY ]; then
+	. $BOEFFLA_STARTCONFIG_EARLY
+	fi
+
 # Apply Boeffla-Kernel default settings 1
 
 	# Ext4 tweaks default to on
