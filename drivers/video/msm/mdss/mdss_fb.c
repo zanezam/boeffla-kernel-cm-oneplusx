@@ -710,7 +710,7 @@ static DEVICE_ATTR(cabc, S_IRUGO|S_IWUSR, mdss_get_cabc, mdss_set_cabc);
 #endif /*VENDOR_EDIT*/
 #ifdef VENDOR_EDIT
 /* Mobile Phone Software Dept.Driver, 2014/04/12  Add for gamma correction */
-static DEVICE_ATTR(gamma, S_IRUGO|S_IWUSR, mdss_get_gamma, mdss_set_gamma);
+static DEVICE_ATTR(gamma_obsolete, S_IRUGO|S_IWUSR, mdss_get_gamma, mdss_set_gamma);
 #endif /*VENDOR_EDIT*/
 static DEVICE_ATTR(idle_time, S_IRUGO | S_IWUSR | S_IWGRP,
 	mdss_fb_get_idle_time, mdss_fb_set_idle_time);
@@ -743,7 +743,7 @@ static struct attribute *mdss_fb_attrs[] = {
 
 #ifdef VENDOR_EDIT
 	/* Mobile Phone Software Dept.Driver, 2014/04/12  Add for gamma correction */
-		&dev_attr_gamma.attr,
+		&dev_attr_gamma_obsolete.attr,
 #endif /*VENDOR_EDIT*/
 
 #ifdef VENDOR_EDIT
